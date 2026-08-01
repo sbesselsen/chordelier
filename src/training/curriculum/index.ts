@@ -118,7 +118,7 @@ const tier4SecondaryDominant: TaskDefinition = {
     },
     {
       id: 's2',
-      target: { kind: 'romanNumeral', chord: { degree: 2, quality: 'min7' } },
+      target: { kind: 'romanNumeral', chord: { degree: 2, quality: 'min' } },
       prompt: 'ii',
     },
   ],

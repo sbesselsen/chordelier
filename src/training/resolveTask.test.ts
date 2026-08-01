@@ -72,6 +72,17 @@ describe('resolveTask — tier 4 (secondary dominant)', () => {
       expect(applied?.expectedPitchClasses).toHaveLength(4) // dominant 7th
     }
   })
+
+  it('resolves the "ii" step to a plain triad, matching its prompt (no "7")', () => {
+    // Regression: the target quality was originally authored as min7 (D F A
+    // C) while the prompt just said "ii" — which conventionally means a
+    // triad, no "7" suffix. That mismatch meant a correctly-played D minor
+    // triad was graded as missing a note the prompt never asked for.
+    const key: KeySignature = { tonicPitchClass: pitchClass(0), scaleType: 'major' }
+    const [, ii] = resolveTask(task, key)
+    expect(ii?.prompt).toBe('ii')
+    expect(ii?.expectedPitchClasses).toEqual([2, 5, 9]) // D F A — triad, no 7th
+  })
 })
 
 describe('resolveTask — tier 5 (line cliché, fixed key)', () => {
