@@ -98,6 +98,14 @@
   width: 100%;
 }
 
+.training-task-view__key {
+  font-size: 13px;
+  color: var(--text);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .training-task-view__prompt {
   font-size: 40px;
   font-weight: 600;

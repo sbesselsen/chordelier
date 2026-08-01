@@ -51,6 +51,10 @@ describe('TrainingPage', () => {
     await act(async () => startManualSession())
     act(() => screen.getByRole('button', { name: 'Start playing' }).click())
 
+    // The resolved session key stays visible throughout — matters most when
+    // it was randomized, since otherwise there'd be no way to know it.
+    expect(screen.getByText('Key: C major')).toBeInTheDocument()
+
     // Step 1: I = C E G
     expect(screen.getByText('I')).toBeInTheDocument()
     act(() => play(60, 64, 67))

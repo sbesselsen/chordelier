@@ -6,13 +6,13 @@ import { TaskStepIndicator } from '../components/training/TaskStepIndicator'
 import { TrainingResultsSummary } from '../components/training/TrainingResultsSummary'
 import { TrainingTaskView } from '../components/training/TrainingTaskView'
 import '../components/training/training.css'
+import { formatKeySignature } from '../components/training/formatKeySignature'
 import { useHeldChordDisplay } from '../hooks/useHeldChordDisplay'
 import { useHeldNotes } from '../input/useHeldNotes'
 import { mockNoteOff, mockNoteOn } from '../input/mockNoteSource'
 import { type PitchClass, pitchClass } from '../theory/pitch'
 import type { KeySignature } from '../theory/scale'
 import { detectChord } from '../theory/chordDetection'
-import { pitchClassName } from '../theory/spelling'
 import { CURRICULUM, getTaskById } from '../training/curriculum'
 import { resolveSessionKey } from '../training/session'
 import type { TaskDefinition } from '../training/taskSchema'
@@ -74,6 +74,7 @@ function TrainingSession({ task, sessionKey, onPlayAgain, onBackToSetup }: Train
     <div className="training-session">
       <TaskStepIndicator steps={trainingTask.stepReviews} />
       <TrainingTaskView
+        sessionKey={sessionKey}
         prompt={trainingTask.currentPrompt}
         heldNotes={heldNotes}
         chordResult={chordResult}
@@ -116,9 +117,7 @@ export function TrainingPage() {
         onSelectTask={setSelectedTaskId}
         keyChoiceApplicable={selectedTask.keyMode === 'randomize'}
         fixedKeyLabel={
-          selectedTask.fixedKey
-            ? `${pitchClassName(selectedTask.fixedKey.tonicPitchClass)} ${selectedTask.fixedKey.scaleType}`
-            : undefined
+          selectedTask.fixedKey ? formatKeySignature(selectedTask.fixedKey) : undefined
         }
         keyMode={keyMode}
         onKeyModeChange={setKeyMode}

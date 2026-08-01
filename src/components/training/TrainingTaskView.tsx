@@ -1,13 +1,17 @@
 import { PianoKeyboard } from '../Piano/PianoKeyboard'
 import type { ChordDetectionResult } from '../../theory/chordDetection'
 import type { MidiNoteNumber } from '../../theory/pitch'
+import type { KeySignature } from '../../theory/scale'
 import { formatChordName } from '../../theory/spelling'
 import type { StepEvaluation } from '../../training/grading'
 import type { TrainingTaskStatus } from '../../training/useTrainingTask'
 import { formatEvaluationDiagnostics } from './formatEvaluation'
+import { formatKeySignature } from './formatKeySignature'
 import { STEP_STATUS_SYMBOL } from './resultSymbols'
 
 export interface TrainingTaskViewProps {
+  /** Shown throughout the exercise — matters most for a randomized key, since you otherwise have no way to know what it landed on. */
+  sessionKey: KeySignature
   /** The instruction to play (e.g. "V7/ii") — never the resolved chord name/notes, so the task stays a recall exercise rather than a follow-along. */
   prompt?: string
   heldNotes: ReadonlySet<MidiNoteNumber>
@@ -18,6 +22,7 @@ export interface TrainingTaskViewProps {
 }
 
 export function TrainingTaskView({
+  sessionKey,
   prompt,
   heldNotes,
   chordResult,
@@ -28,6 +33,7 @@ export function TrainingTaskView({
 
   return (
     <div className="training-task-view">
+      <p className="training-task-view__key">Key: {formatKeySignature(sessionKey)}</p>
       <p className="training-task-view__prompt">{prompt ?? '—'}</p>
 
       <div className="training-task-view__feedback" aria-live="polite">
