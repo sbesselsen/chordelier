@@ -15,6 +15,11 @@ function release(...notes: number[]) {
   for (const note of notes) heldNotesStore.noteOff(midiNote(note), SOURCE)
 }
 
+function startManualSession() {
+  screen.getByRole('radio', { name: 'Manual' }).click()
+  screen.getByRole('button', { name: 'Start' }).click()
+}
+
 beforeEach(() => vi.useFakeTimers())
 afterEach(() => {
   vi.useRealTimers()
@@ -22,20 +27,29 @@ afterEach(() => {
 })
 
 describe('TrainingPage', () => {
-  it('shows session setup first', () => {
+  it('shows session setup first, with the selected task described', () => {
     render(<TrainingPage />)
     expect(screen.getByText('Task')).toBeInTheDocument()
+    expect(screen.getByText(/Roman numerals name a chord/)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument()
+  })
+
+  it('shows a task intro before the first step, explaining the exercise', async () => {
+    render(<TrainingPage />)
+    await act(async () => startManualSession())
+
+    expect(screen.getByRole('heading', { name: 'I – IV – vi – V' })).toBeInTheDocument()
+    expect(screen.getByText(/Roman numerals name a chord/)).toBeInTheDocument()
+    expect(screen.queryByText('Skip')).not.toBeInTheDocument() // not in the training view yet
+
+    act(() => screen.getByRole('button', { name: 'Start playing' }).click())
+    expect(screen.getByText('I')).toBeInTheDocument()
   })
 
   it('plays a full task in a manually chosen key through to the results summary', async () => {
     render(<TrainingPage />)
-
-    // Force a deterministic key (manual, defaults to C) instead of random.
-    await act(async () => {
-      screen.getByRole('radio', { name: 'Manual' }).click()
-      screen.getByRole('button', { name: 'Start' }).click()
-    })
+    await act(async () => startManualSession())
+    act(() => screen.getByRole('button', { name: 'Start playing' }).click())
 
     // Step 1: I = C E G
     expect(screen.getByText('I')).toBeInTheDocument()
@@ -73,12 +87,10 @@ describe('TrainingPage', () => {
     act(() => release(67, 71, 62))
   })
 
-  it('"Play again" starts a fresh attempt at the same task/key', async () => {
+  it('"Play again" starts a fresh attempt without re-showing the intro', async () => {
     render(<TrainingPage />)
-    await act(async () => {
-      screen.getByRole('radio', { name: 'Manual' }).click()
-      screen.getByRole('button', { name: 'Start' }).click()
-    })
+    await act(async () => startManualSession())
+    act(() => screen.getByRole('button', { name: 'Start playing' }).click())
 
     act(() => play(60, 64, 67))
     act(() => vi.advanceTimersByTime(SETTLE_MS))
@@ -92,19 +104,20 @@ describe('TrainingPage', () => {
     expect(screen.getByText('Nice work!')).toBeInTheDocument()
 
     act(() => screen.getByRole('button', { name: 'Play again' }).click())
-    expect(screen.getByText('I')).toBeInTheDocument() // back at step 1
+    expect(screen.getByText('I')).toBeInTheDocument() // straight back into step 1, no intro replay
   })
 
-  it('"End session" mid-task returns to setup', async () => {
+  it('"End session" mid-task returns to setup, and starting again re-shows the intro', async () => {
     render(<TrainingPage />)
-    await act(async () => {
-      screen.getByRole('radio', { name: 'Manual' }).click()
-      screen.getByRole('button', { name: 'Start' }).click()
-    })
+    await act(async () => startManualSession())
+    act(() => screen.getByRole('button', { name: 'Start playing' }).click())
     expect(screen.getByText('I')).toBeInTheDocument()
 
     act(() => screen.getByRole('button', { name: 'End session' }).click())
     expect(screen.getByText('Task')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument()
+
+    await act(async () => startManualSession())
+    expect(screen.getByRole('heading', { name: 'I – IV – vi – V' })).toBeInTheDocument()
   })
 })

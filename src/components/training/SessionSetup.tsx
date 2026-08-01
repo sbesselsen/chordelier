@@ -9,6 +9,7 @@ export type KeyChoiceMode = 'random' | 'manual'
 export interface SessionSetupProps {
   tasks: readonly TaskDefinition[]
   selectedTaskId: string
+  selectedTaskDescription?: string
   onSelectTask: (id: string) => void
   /** Only shown/relevant when the selected task's own keyMode is 'randomize' — a task pinned to a fixed key isn't user-choosable. */
   keyChoiceApplicable: boolean
@@ -23,6 +24,7 @@ export interface SessionSetupProps {
 export function SessionSetup({
   tasks,
   selectedTaskId,
+  selectedTaskDescription,
   onSelectTask,
   keyChoiceApplicable,
   fixedKeyLabel,
@@ -44,6 +46,10 @@ export function SessionSetup({
           ))}
         </select>
       </label>
+
+      {selectedTaskDescription && (
+        <p className="session-setup__description">{selectedTaskDescription}</p>
+      )}
 
       {keyChoiceApplicable ? (
         <fieldset className="session-setup__field">

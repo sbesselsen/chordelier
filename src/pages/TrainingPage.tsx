@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { DevMockKeyboard } from '../components/DevMockKeyboard'
 import { type KeyChoiceMode, SessionSetup } from '../components/training/SessionSetup'
+import { TaskIntro } from '../components/training/TaskIntro'
 import { TaskStepIndicator } from '../components/training/TaskStepIndicator'
 import { TrainingResultsSummary } from '../components/training/TrainingResultsSummary'
 import { TrainingTaskView } from '../components/training/TrainingTaskView'
@@ -98,6 +99,9 @@ function TrainingSession({ task, sessionKey, onPlayAgain, onBackToSetup }: Train
 
 export function TrainingPage() {
   const [session, setSession] = useState<SessionConfig | null>(null)
+  // Shown once for a genuinely new session, not re-shown on "Play again" —
+  // by then you already know what the exercise is asking for.
+  const [introDismissed, setIntroDismissed] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState(DEFAULT_TASK.id)
   const [keyMode, setKeyMode] = useState<KeyChoiceMode>('random')
   const [manualTonic, setManualTonic] = useState<PitchClass>(pitchClass(0))
@@ -109,6 +113,7 @@ export function TrainingPage() {
       <SessionSetup
         tasks={CURRICULUM}
         selectedTaskId={selectedTask.id}
+        selectedTaskDescription={selectedTask.description}
         onSelectTask={setSelectedTaskId}
         keyChoiceApplicable={selectedTask.keyMode === 'randomize'}
         fixedKeyLabel={
@@ -120,15 +125,20 @@ export function TrainingPage() {
         onKeyModeChange={setKeyMode}
         manualTonic={manualTonic}
         onManualTonicChange={setManualTonic}
-        onStart={() =>
+        onStart={() => {
           setSession({
             task: selectedTask,
             sessionKey: resolveChosenKey(selectedTask, keyMode, manualTonic),
             attempt: 0,
           })
-        }
+          setIntroDismissed(false)
+        }}
       />
     )
+  }
+
+  if (!introDismissed) {
+    return <TaskIntro task={session.task} onStart={() => setIntroDismissed(true)} />
   }
 
   return (

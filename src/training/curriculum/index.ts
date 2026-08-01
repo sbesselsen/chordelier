@@ -12,7 +12,8 @@ import type { DifficultyLevel, TaskDefinition } from '../taskSchema'
 const tier1RootPositionTriads: TaskDefinition = {
   id: 'diatonic-I-IV-vi-V',
   title: 'I – IV – vi – V',
-  description: 'The most common pop progression, root position.',
+  description:
+    'The most common pop progression, root position. Roman numerals name a chord by its scale degree in the current key — uppercase for major, lowercase for minor. I is the tonic (1st degree), IV the subdominant (4th), vi the relative minor (6th), and V the dominant (5th). Play each in root position, any voicing.',
   difficulty: 1,
   tags: ['diatonic', 'triads'],
   defaultGradingMode: 'pitchClass',
@@ -44,7 +45,8 @@ const tier1RootPositionTriads: TaskDefinition = {
 const tier2TriadInversions: TaskDefinition = {
   id: 'tonic-triad-inversions',
   title: 'Tonic triad through its inversions',
-  description: 'Play I in root position, then first inversion, then second inversion.',
+  description:
+    'An inversion changes which chord tone sits in the bass (the lowest note) without changing the chord itself. Root position has the root in the bass; first inversion has the 3rd in the bass; second inversion has the 5th in the bass. Play the tonic triad (I) through all three, in a randomized key.',
   difficulty: 2,
   tags: ['diatonic', 'triads', 'inversions'],
   defaultGradingMode: 'exactVoicing',
@@ -74,7 +76,8 @@ const tier2TriadInversions: TaskDefinition = {
 const tier3DiatonicSevenths: TaskDefinition = {
   id: 'ii-V-I-sevenths',
   title: 'ii7 – V7 – Imaj7',
-  description: 'The core jazz cadence, with 7th chords throughout.',
+  description:
+    "The core jazz cadence, with 7th chords throughout. A number after a roman numeral means add the 7th on top of the triad. ii7 and V7 are the diatonic minor-7th and dominant-7th chords; Imaj7 keeps the tonic's major quality but adds a major 7th ('maj7', to distinguish it from a dominant 7th).",
   difficulty: 3,
   tags: ['diatonic', 'seventh-chords'],
   defaultGradingMode: 'pitchClass',
@@ -101,7 +104,8 @@ const tier3DiatonicSevenths: TaskDefinition = {
 const tier4SecondaryDominant: TaskDefinition = {
   id: 'secondary-dominant-to-ii',
   title: 'ii via its secondary dominant',
-  description: 'Tonicize ii with its own dominant 7th before resolving.',
+  description:
+    'A secondary dominant borrows the "V7 resolves down a 5th" idea and applies it to a chord other than the tonic. V7/ii ("five-seven of two") means: build a dominant 7th chord a perfect 5th above ii — exactly like you\'d build V7 above the real tonic — then resolve it down to ii, the same way V7 normally resolves to I. This briefly makes ii feel like its own temporary tonic. You\'ll play V7/ii first, then resolve to ii itself.',
   difficulty: 4,
   tags: ['secondary-dominant'],
   defaultGradingMode: 'pitchClass',
@@ -125,7 +129,8 @@ const C_NATURAL_MINOR: KeySignature = { tonicPitchClass: pitchClass(0), scaleTyp
 const tier5LineCliche: TaskDefinition = {
   id: 'line-cliche-rising-to-V',
   title: 'Line cliché rising to the dominant',
-  description: 'A chromatic inner-voice line over a held tonic, resolving to V7.',
+  description:
+    'Hold the minor tonic triad (i) while one inner voice climbs by half steps: the 5th rises to a sharp 5 (i(♯5), an augmented triad), then a further half step to form an added 6th (i(6)) — the root and 3rd stay put throughout. Finally resolve to V7. This is graded on exact voicing: the moving note has to be in the correct voice, not just the right pitch classes in any octave.',
   difficulty: 5,
   tags: ['voice-leading', 'chromatic'],
   defaultGradingMode: 'exactVoicing',
