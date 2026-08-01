@@ -1,0 +1,53 @@
+.piano-keyboard {
+  position: relative;
+  width: 100%;
+  user-select: none;
+}
+
+.piano-keyboard__white-row {
+  display: flex;
+  width: 100%;
+  height: 160px;
+}
+
+.piano-keyboard__black-row {
+  position: absolute;
+  inset: 0;
+  height: 62%;
+  pointer-events: none;
+}
+
+.piano-keyboard__black-slot {
+  position: absolute;
+  top: 0;
+  left: calc((100% / var(--white-key-count)) * var(--white-index));
+  width: calc((100% / var(--white-key-count)) * 0.6);
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.piano-key {
+  box-sizing: border-box;
+  height: 100%;
+  border-radius: 0 0 4px 4px;
+  transition: background-color 60ms ease-out;
+}
+
+.piano-key--white {
+  flex: 1 0 0;
+  background: var(--key-white);
+  border: 1px solid var(--border);
+}
+
+.piano-key--black {
+  width: 100%;
+  background: var(--key-black);
+}
+
+.piano-key--held.piano-key--white {
+  background: var(--accent);
+}
+
+.piano-key--held.piano-key--black {
+  background: var(--accent);
+}

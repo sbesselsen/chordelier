@@ -1,0 +1,8 @@
+{
+  "name": "Node.js 25 Alpine",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "vscode",
+  "containerUser": "node"
+}
