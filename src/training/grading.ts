@@ -10,6 +10,10 @@ export interface StepEvaluation {
   wrongPitchClasses: readonly PitchClass[]
   missingPitchClasses: readonly PitchClass[]
   bassOk: boolean
+  /** Always the target's bass, for display purposes — informational even when gradingMode isn't 'exactVoicing' (bassOk is then vacuously true and this goes unused). */
+  expectedBassPitchClass: PitchClass
+  /** Null only when nothing was held (noAttempt). */
+  actualBassPitchClass: PitchClass | null
 }
 
 export function evaluateAttempt(
@@ -23,6 +27,8 @@ export function evaluateAttempt(
       wrongPitchClasses: [],
       missingPitchClasses: step.expectedPitchClasses,
       bassOk: false,
+      expectedBassPitchClass: step.expectedBassPitchClass,
+      actualBassPitchClass: null,
     }
   }
 
@@ -33,8 +39,9 @@ export function evaluateAttempt(
 
   const bass = lowestNote(heldNotes)
   if (bass === null) throw new Error('unreachable: heldNotes is non-empty here')
+  const actualBassPitchClass = toPitchClass(bass)
   const bassOk =
-    step.gradingMode !== 'exactVoicing' || toPitchClass(bass) === step.expectedBassPitchClass
+    step.gradingMode !== 'exactVoicing' || actualBassPitchClass === step.expectedBassPitchClass
 
   const result: StepResult =
     wrongPitchClasses.length > 0
@@ -53,5 +60,13 @@ export function evaluateAttempt(
           )
         : 0.45 * Math.max(0, 1 - wrongPitchClasses.length / held.size)
 
-  return { result, score, wrongPitchClasses, missingPitchClasses, bassOk }
+  return {
+    result,
+    score,
+    wrongPitchClasses,
+    missingPitchClasses,
+    bassOk,
+    expectedBassPitchClass: step.expectedBassPitchClass,
+    actualBassPitchClass,
+  }
 }

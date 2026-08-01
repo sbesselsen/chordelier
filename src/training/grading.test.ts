@@ -64,6 +64,10 @@ describe('evaluateAttempt — exactVoicing grading', () => {
     const evaluation = evaluateAttempt(firstInversion, EXACT_VOICING_STEP)
     expect(evaluation.result).toBe('partial') // right notes, wrong voicing
     expect(evaluation.bassOk).toBe(false)
+    // Regression: these must be populated so the UI can actually explain
+    // *what* was wrong (missing/wrongPitchClasses are both empty here).
+    expect(evaluation.expectedBassPitchClass).toBe(0) // C
+    expect(evaluation.actualBassPitchClass).toBe(4) // E
   })
 
   it('does not care about octave placement of the bass, only its pitch class', () => {

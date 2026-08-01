@@ -27,7 +27,10 @@ function check(label, condition) {
 async function startManualSession(page, taskLabel) {
   await page.waitForSelector('.session-setup')
   if (taskLabel) await page.selectOption('select', { label: taskLabel })
-  await page.getByRole('radio', { name: 'Manual' }).click() // deterministic key (C)
+  // Fixed-key tasks (e.g. the line cliché) don't show a key picker at all —
+  // only click "Manual" (deterministic key) when the task has one.
+  const manualRadio = page.getByRole('radio', { name: 'Manual' })
+  if (await manualRadio.count()) await manualRadio.click()
   await page.getByRole('button', { name: 'Start' }).click()
   await page.waitForSelector('.task-intro')
   await page.getByRole('button', { name: 'Start playing' }).click()
@@ -111,6 +114,22 @@ const viText = await stepRows[2]?.textContent()
 check(`step 3 (vi, extra C#) shows "Extra" (got "${viText}")`, /Extra /.test(viText ?? ''))
 const iText = await stepRows[0]?.textContent()
 check(`step 1 (correct) shows no diagnostics (got "${iText}")`, !/Missing|Extra/.test(iText ?? ''))
+await clearAllMockNotes(page)
+
+// --- Regression: right notes but wrong bass (exactVoicing) must explain the bass, not show blank diagnostics ---
+await page.getByRole('button', { name: 'Choose another task' }).click()
+await startManualSession(page, 'Line cliché rising to the dominant (tier 5)')
+await playChordAndAdvance(page, [48, 51, 55]) // i = C Eb G, root position
+await playChordAndAdvance(page, [48, 51, 56]) // i(#5) = C Eb G#, root position
+await playChordAndAdvance(page, [48, 51, 57]) // i(6) = C Eb A, root position
+await playChordAndAdvance(page, [59, 62, 65, 67]) // V7 = G B D F, all correct pitch classes, but B3 (59) is the bass instead of G
+
+await page.waitForSelector('.training-results-summary')
+const lastStepText = await page.locator('.training-results-summary__step').last().textContent()
+check(
+  `V7 in the wrong inversion shows "close" with a bass explanation (got "${lastStepText}")`,
+  /~/.test(lastStepText ?? '') && /Wrong bass note/.test(lastStepText ?? ''),
+)
 await clearAllMockNotes(page)
 
 reportConsoleErrors(consoleErrors)
