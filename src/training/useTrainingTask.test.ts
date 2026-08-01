@@ -60,6 +60,27 @@ describe('useTrainingTask', () => {
     expect(result.current.currentPrompt).toBe('IV')
   })
 
+  it('derives per-step display statuses as the task progresses', () => {
+    const { result } = renderHook(() => useTrainingTask(TASK, KEY))
+    expect(result.current.stepStatuses).toEqual([
+      { id: 's1', status: 'current' },
+      { id: 's2', status: 'pending' },
+    ])
+
+    act(() => playCMajor())
+    act(() => vi.advanceTimersByTime(SETTLE_MS))
+    expect(result.current.stepStatuses).toEqual([
+      { id: 's1', status: 'correct' },
+      { id: 's2', status: 'pending' },
+    ])
+
+    act(() => vi.advanceTimersByTime(FEEDBACK_MS))
+    expect(result.current.stepStatuses).toEqual([
+      { id: 's1', status: 'correct' },
+      { id: 's2', status: 'current' },
+    ])
+  })
+
   it('re-seeds the new step from currently-held notes with no further physical input', () => {
     // Regression coverage for the useEffect dependency design: a step
     // transition must itself trigger a fresh evaluation even if heldNotes

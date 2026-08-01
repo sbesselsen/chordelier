@@ -1,0 +1,134 @@
+.session-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 360px;
+  margin: 32px auto;
+}
+
+.session-setup__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.session-setup__start {
+  padding: 10px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.training-session {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 0;
+}
+
+.task-step-indicator {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.task-step-indicator__step {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.task-step-indicator__step--correct {
+  color: #2e9e4f;
+}
+.task-step-indicator__step--partial {
+  color: #b8860b;
+}
+.task-step-indicator__step--incorrect {
+  color: #d94141;
+}
+.task-step-indicator__step--current {
+  color: var(--accent);
+}
+.task-step-indicator__step--pending {
+  color: var(--border);
+}
+.task-step-indicator__step--skipped,
+.task-step-indicator__step--noAttempt {
+  color: var(--text);
+  opacity: 0.5;
+}
+
+.training-task-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.training-task-view__prompt {
+  font-size: 40px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.training-task-view__feedback {
+  min-height: 28px;
+  font-size: 18px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.training-task-view__result--correct {
+  color: #2e9e4f;
+}
+.training-task-view__result--partial {
+  color: #b8860b;
+}
+.training-task-view__result--incorrect {
+  color: #d94141;
+}
+.training-task-view__result--noAttempt {
+  color: var(--text);
+}
+
+.training-task-view__diagnostics {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.training-task-view__chord-name {
+  font-size: 16px;
+  color: var(--text);
+  min-height: 20px;
+  margin: 0;
+}
+
+.training-results-summary {
+  max-width: 420px;
+  margin: 32px auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.training-results-summary__steps {
+  display: flex;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.training-results-summary__actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}

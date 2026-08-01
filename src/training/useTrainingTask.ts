@@ -9,6 +9,15 @@ import type { TaskDefinition } from './taskSchema'
 
 export type TrainingTaskStatus = 'listening' | 'graded' | 'complete' | 'abandoned'
 
+/** Richer than StepResult — adds the two states a step can be in before it's ever graded. */
+export type StepDisplayStatus =
+  'pending' | 'current' | 'correct' | 'partial' | 'incorrect' | 'noAttempt' | 'skipped'
+
+export interface StepStatusEntry {
+  id: string
+  status: StepDisplayStatus
+}
+
 export interface TrainingTaskViewModel {
   status: TrainingTaskStatus
   stepIndex: number
@@ -17,6 +26,7 @@ export interface TrainingTaskViewModel {
   currentDisplayChordName?: string
   lastEvaluation: StepEvaluation | null
   stepResults: readonly StepOutcomeRecord[]
+  stepStatuses: readonly StepStatusEntry[]
   skip: () => void
   abandon: () => void
   reset: () => void
@@ -50,6 +60,22 @@ export function useTrainingTask(
 
   const currentStep = resolvedSteps[stepIndex]
 
+  const stepStatuses = useMemo<StepStatusEntry[]>(
+    () =>
+      resolvedSteps.map((step, index) => {
+        const recorded = stepResults[index]
+        const stepStatus: StepDisplayStatus = recorded
+          ? recorded.outcome.type === 'skipped'
+            ? 'skipped'
+            : recorded.outcome.evaluation.result
+          : index === stepIndex
+            ? 'current'
+            : 'pending'
+        return { id: step.id, status: stepStatus }
+      }),
+    [resolvedSteps, stepResults, stepIndex],
+  )
+
   return {
     status,
     stepIndex,
@@ -58,6 +84,7 @@ export function useTrainingTask(
     currentDisplayChordName: currentStep?.displayChordName,
     lastEvaluation,
     stepResults,
+    stepStatuses,
     skip: () => actorRef.send({ type: 'SKIP_STEP' }),
     abandon: () => actorRef.send({ type: 'ABANDON' }),
     reset: () => actorRef.send({ type: 'RESET' }),

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { FreePlayPage } from './pages/FreePlayPage'
-import { TrainingDebugPage } from './pages/TrainingDebugPage'
+import { TrainingPage } from './pages/TrainingPage'
 
-type Tab = 'freePlay' | 'trainingDebug'
+type Tab = 'freePlay' | 'training'
 
 function App() {
   const [tab, setTab] = useState<Tab>('freePlay')
@@ -14,15 +14,11 @@ function App() {
         <button type="button" onClick={() => setTab('freePlay')} disabled={tab === 'freePlay'}>
           Free Play
         </button>
-        <button
-          type="button"
-          onClick={() => setTab('trainingDebug')}
-          disabled={tab === 'trainingDebug'}
-        >
-          Training (debug)
+        <button type="button" onClick={() => setTab('training')} disabled={tab === 'training'}>
+          Training
         </button>
       </nav>
-      {tab === 'freePlay' ? <FreePlayPage /> : <TrainingDebugPage />}
+      {tab === 'freePlay' ? <FreePlayPage /> : <TrainingPage />}
     </main>
   )
 }
