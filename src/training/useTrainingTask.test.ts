@@ -62,23 +62,37 @@ describe('useTrainingTask', () => {
 
   it('derives per-step display statuses as the task progresses', () => {
     const { result } = renderHook(() => useTrainingTask(TASK, KEY))
-    expect(result.current.stepStatuses).toEqual([
+    expect(result.current.stepReviews.map((s) => ({ id: s.id, status: s.status }))).toEqual([
       { id: 's1', status: 'current' },
       { id: 's2', status: 'pending' },
     ])
 
     act(() => playCMajor())
     act(() => vi.advanceTimersByTime(SETTLE_MS))
-    expect(result.current.stepStatuses).toEqual([
+    expect(result.current.stepReviews.map((s) => ({ id: s.id, status: s.status }))).toEqual([
       { id: 's1', status: 'correct' },
       { id: 's2', status: 'pending' },
     ])
 
     act(() => vi.advanceTimersByTime(FEEDBACK_MS))
-    expect(result.current.stepStatuses).toEqual([
+    expect(result.current.stepReviews.map((s) => ({ id: s.id, status: s.status }))).toEqual([
       { id: 's1', status: 'correct' },
       { id: 's2', status: 'current' },
     ])
+  })
+
+  it('carries the evaluation detail into the step review once graded', () => {
+    const { result } = renderHook(() => useTrainingTask(TASK, KEY))
+
+    act(() => {
+      heldNotesStore.noteOn(midiNote(60), SOURCE)
+      heldNotesStore.noteOn(midiNote(64), SOURCE)
+    }) // missing G
+    act(() => vi.advanceTimersByTime(SETTLE_MS))
+
+    const [s1] = result.current.stepReviews
+    expect(s1?.status).toBe('partial')
+    expect(s1?.evaluation?.missingPitchClasses).toEqual([7])
   })
 
   it('does not auto-grade the new step against notes resting unchanged from the previous step', () => {

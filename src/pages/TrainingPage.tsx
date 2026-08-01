@@ -63,8 +63,7 @@ function TrainingSession({ task, sessionKey, onPlayAgain, onBackToSetup }: Train
       <TrainingResultsSummary
         taskTitle={task.title}
         wasAbandoned={trainingTask.status === 'abandoned'}
-        totalSteps={trainingTask.totalSteps}
-        stepResults={trainingTask.stepResults}
+        stepReviews={trainingTask.stepReviews}
         onPlayAgain={onPlayAgain}
         onBackToSetup={onBackToSetup}
       />
@@ -73,7 +72,7 @@ function TrainingSession({ task, sessionKey, onPlayAgain, onBackToSetup }: Train
 
   return (
     <div className="training-session">
-      <TaskStepIndicator steps={trainingTask.stepStatuses} />
+      <TaskStepIndicator steps={trainingTask.stepReviews} />
       <TrainingTaskView
         prompt={trainingTask.currentPrompt}
         heldNotes={heldNotes}

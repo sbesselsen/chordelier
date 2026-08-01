@@ -1,8 +1,8 @@
-import type { StepStatusEntry } from '../../training/useTrainingTask'
+import type { StepReview } from '../../training/useTrainingTask'
 import { STEP_STATUS_SYMBOL } from './resultSymbols'
 
 export interface TaskStepIndicatorProps {
-  steps: readonly StepStatusEntry[]
+  steps: readonly Pick<StepReview, 'id' | 'status'>[]
 }
 
 export function TaskStepIndicator({ steps }: TaskStepIndicatorProps) {

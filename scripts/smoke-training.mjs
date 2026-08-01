@@ -89,6 +89,29 @@ const resultSymbol = await page
   .catch(() => null)
 check(`plain ii triad grades correct (got "${resultSymbol}")`, resultSymbol === '✓')
 await releaseChord(page, [62, 65, 69])
+await clearAllMockNotes(page)
+
+// --- Regression: per-step mistake detail must survive into the results summary, not just the tally ---
+await page.getByRole('button', { name: 'End session' }).click()
+await startManualSession(page, 'I – IV – vi – V (tier 1)')
+await playChordAndAdvance(page, [60, 64, 67]) // I  = C E G, correct
+await playChordAndAdvance(page, [65, 60]) // IV = F A C, missing A -> partial
+await playChordAndAdvance(page, [69, 60, 64, 61]) // vi = A C E, extra C# -> incorrect
+await playChordAndAdvance(page, [67, 71, 62]) // V  = G B D, correct
+
+await page.waitForSelector('.training-results-summary')
+const stepRows = await page.locator('.training-results-summary__step').all()
+check('results breakdown lists all 4 steps', stepRows.length === 4)
+const ivText = await stepRows[1]?.textContent()
+check(
+  `step 2 (IV, missing A) shows "Missing A" (got "${ivText}")`,
+  /Missing A\b/.test(ivText ?? ''),
+)
+const viText = await stepRows[2]?.textContent()
+check(`step 3 (vi, extra C#) shows "Extra" (got "${viText}")`, /Extra /.test(viText ?? ''))
+const iText = await stepRows[0]?.textContent()
+check(`step 1 (correct) shows no diagnostics (got "${iText}")`, !/Missing|Extra/.test(iText ?? ''))
+await clearAllMockNotes(page)
 
 reportConsoleErrors(consoleErrors)
 check('no console errors', consoleErrors.length === 0)

@@ -4,7 +4,7 @@ import { useHeldNotes } from '../input/useHeldNotes'
 import type { KeySignature } from '../theory/scale'
 import type { StepEvaluation } from './grading'
 import { resolveTask } from './resolveTask'
-import { type StepOutcomeRecord, taskMachine } from './taskMachine'
+import { taskMachine } from './taskMachine'
 import type { TaskDefinition } from './taskSchema'
 
 export type TrainingTaskStatus = 'listening' | 'graded' | 'complete' | 'abandoned'
@@ -13,9 +13,13 @@ export type TrainingTaskStatus = 'listening' | 'graded' | 'complete' | 'abandone
 export type StepDisplayStatus =
   'pending' | 'current' | 'correct' | 'partial' | 'incorrect' | 'noAttempt' | 'skipped'
 
-export interface StepStatusEntry {
+/** Per-step summary carrying enough to render both the in-progress step indicator and the post-session breakdown from one source. */
+export interface StepReview {
   id: string
+  prompt?: string
   status: StepDisplayStatus
+  /** Present only for graded (not skipped/pending/current) steps — the missing/wrong-note detail survives past the brief in-progress feedback window. */
+  evaluation: StepEvaluation | null
 }
 
 export interface TrainingTaskViewModel {
@@ -25,8 +29,7 @@ export interface TrainingTaskViewModel {
   currentPrompt?: string
   currentDisplayChordName?: string
   lastEvaluation: StepEvaluation | null
-  stepResults: readonly StepOutcomeRecord[]
-  stepStatuses: readonly StepStatusEntry[]
+  stepReviews: readonly StepReview[]
   skip: () => void
   abandon: () => void
   reset: () => void
@@ -66,18 +69,27 @@ export function useTrainingTask(
 
   const currentStep = resolvedSteps[stepIndex]
 
-  const stepStatuses = useMemo<StepStatusEntry[]>(
+  const stepReviews = useMemo<StepReview[]>(
     () =>
       resolvedSteps.map((step, index) => {
         const recorded = stepResults[index]
-        const stepStatus: StepDisplayStatus = recorded
-          ? recorded.outcome.type === 'skipped'
-            ? 'skipped'
-            : recorded.outcome.evaluation.result
-          : index === stepIndex
-            ? 'current'
-            : 'pending'
-        return { id: step.id, status: stepStatus }
+        if (!recorded) {
+          return {
+            id: step.id,
+            prompt: step.prompt,
+            status: index === stepIndex ? 'current' : 'pending',
+            evaluation: null,
+          }
+        }
+        if (recorded.outcome.type === 'skipped') {
+          return { id: step.id, prompt: step.prompt, status: 'skipped', evaluation: null }
+        }
+        return {
+          id: step.id,
+          prompt: step.prompt,
+          status: recorded.outcome.evaluation.result,
+          evaluation: recorded.outcome.evaluation,
+        }
       }),
     [resolvedSteps, stepResults, stepIndex],
   )
@@ -89,8 +101,7 @@ export function useTrainingTask(
     currentPrompt: currentStep?.prompt,
     currentDisplayChordName: currentStep?.displayChordName,
     lastEvaluation,
-    stepResults,
-    stepStatuses,
+    stepReviews,
     skip: () => actorRef.send({ type: 'SKIP_STEP' }),
     abandon: () => actorRef.send({ type: 'ABANDON' }),
     reset: () => actorRef.send({ type: 'RESET' }),

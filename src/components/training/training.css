@@ -147,14 +147,54 @@
   gap: 12px;
 }
 
-.training-results-summary__steps {
-  display: flex;
-  gap: 6px;
+.training-results-summary__breakdown {
   list-style: none;
   padding: 0;
-  margin: 0;
-  justify-content: center;
-  font-size: 18px;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.training-results-summary__step {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--border) 35%, transparent);
+}
+
+.training-results-summary__step-symbol {
+  font-size: 16px;
+  width: 1.2em;
+  flex-shrink: 0;
+}
+
+.training-results-summary__step--correct .training-results-summary__step-symbol {
+  color: #2e9e4f;
+}
+.training-results-summary__step--partial .training-results-summary__step-symbol {
+  color: #b8860b;
+}
+.training-results-summary__step--incorrect .training-results-summary__step-symbol,
+.training-results-summary__step--noAttempt .training-results-summary__step-symbol {
+  color: #d94141;
+}
+.training-results-summary__step--skipped .training-results-summary__step-symbol {
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.training-results-summary__step-prompt {
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.training-results-summary__step-diagnostics {
+  font-size: 13px;
+  color: var(--text);
 }
 
 .training-results-summary__actions {

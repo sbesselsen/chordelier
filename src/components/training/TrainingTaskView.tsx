@@ -1,9 +1,10 @@
 import { PianoKeyboard } from '../Piano/PianoKeyboard'
 import type { ChordDetectionResult } from '../../theory/chordDetection'
 import type { MidiNoteNumber } from '../../theory/pitch'
-import { formatChordName, pitchClassName } from '../../theory/spelling'
+import { formatChordName } from '../../theory/spelling'
 import type { StepEvaluation } from '../../training/grading'
 import type { TrainingTaskStatus } from '../../training/useTrainingTask'
+import { formatEvaluationDiagnostics } from './formatEvaluation'
 import { STEP_STATUS_SYMBOL } from './resultSymbols'
 
 export interface TrainingTaskViewProps {
@@ -39,13 +40,7 @@ export function TrainingTaskView({
             </span>
             {lastEvaluation.result !== 'correct' && (
               <span className="training-task-view__diagnostics">
-                {lastEvaluation.missingPitchClasses.length > 0 &&
-                  `Missing ${lastEvaluation.missingPitchClasses.map((pc) => pitchClassName(pc)).join(', ')}`}
-                {lastEvaluation.missingPitchClasses.length > 0 &&
-                  lastEvaluation.wrongPitchClasses.length > 0 &&
-                  ' · '}
-                {lastEvaluation.wrongPitchClasses.length > 0 &&
-                  `Extra ${lastEvaluation.wrongPitchClasses.map((pc) => pitchClassName(pc)).join(', ')}`}
+                {formatEvaluationDiagnostics(lastEvaluation)}
               </span>
             )}
           </>
