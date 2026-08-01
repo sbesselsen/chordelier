@@ -16,3 +16,27 @@ export function mockNoteOn(note: number): void {
 export function mockNoteOff(note: number): void {
   heldNotesStore.noteOff(midiNote(note), MOCK_SOURCE_ID)
 }
+
+export function mockNoteClearAll(): void {
+  heldNotesStore.clearSource(MOCK_SOURCE_ID)
+}
+
+declare global {
+  interface Window {
+    __mockNoteSource?: {
+      noteOn(note: number): void
+      noteOff(note: number): void
+      clear(): void
+    }
+  }
+}
+
+// Exposed so browser-driven scripts (scripts/lib/browser.mjs) can drive/reset
+// mock input via page.evaluate regardless of DOM state — in particular,
+// regardless of whether DevMockKeyboard happens to be mounted, which it
+// isn't once a training session ends. Stripped from production builds:
+// import.meta.env.DEV is a compile-time constant, so this whole block is
+// dead-code-eliminated when it's false.
+if (import.meta.env.DEV) {
+  window.__mockNoteSource = { noteOn: mockNoteOn, noteOff: mockNoteOff, clear: mockNoteClearAll }
+}

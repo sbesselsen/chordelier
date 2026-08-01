@@ -1,7 +1,9 @@
 FROM node:25-alpine
 WORKDIR /workspace
 
-RUN apk add --no-cache git doas zsh
+# chromium: browser-driven verification scripts in scripts/ use this rather
+# than Playwright's own bundled Chromium, which doesn't run on musl/Alpine.
+RUN apk add --no-cache git doas zsh chromium
 
 RUN npm config set -g ignore-scripts true && npm config set -g engine-strict true
 RUN npm install -g pnpm@latest-10

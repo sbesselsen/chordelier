@@ -25,3 +25,5 @@ dist-ssr
 *.sw?
 
 .claude/*.local.json
+
+scripts/screenshots/

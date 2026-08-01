@@ -11,7 +11,14 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server:start": "scripts/dev-server.sh start",
+    "server:stop": "scripts/dev-server.sh stop",
+    "server:status": "scripts/dev-server.sh status",
+    "screenshot": "node scripts/screenshot.mjs",
+    "smoke": "pnpm run smoke:free-play && pnpm run smoke:training",
+    "smoke:free-play": "node scripts/smoke-free-play.mjs",
+    "smoke:training": "node scripts/smoke-training.mjs"
   },
   "dependencies": {
     "@xstate/react": "^6.1.0",
@@ -35,6 +42,7 @@
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.8.0",
     "jsdom": "^25.0.1",
+    "playwright": "^1.62.1",
     "prettier": "^3.9.6",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.65.0",
