@@ -81,11 +81,13 @@ describe('useTrainingTask', () => {
     ])
   })
 
-  it('re-seeds the new step from currently-held notes with no further physical input', () => {
-    // Regression coverage for the useEffect dependency design: a step
-    // transition must itself trigger a fresh evaluation even if heldNotes
-    // hasn't changed since the previous step's grading, or the new step
-    // would stall in awaitingInput forever whenever nothing changes hands.
+  it('does not auto-grade the new step against notes resting unchanged from the previous step', () => {
+    // Regression coverage: an earlier version re-sent NOTES_CHANGED on every
+    // step transition even when heldNotes hadn't actually changed, so simply
+    // resting on the just-graded chord for long enough silently graded the
+    // *next* step against that stale input — reported as reproducing
+    // immediately in real play. "No time pressure" requires the opposite:
+    // nothing should happen until the player actually changes something.
     const { result } = renderHook(() => useTrainingTask(TASK, KEY))
 
     act(() => playCMajor())
@@ -94,9 +96,27 @@ describe('useTrainingTask', () => {
     expect(result.current.status).toBe('listening')
 
     // Still holding C E G from step 1 — never touched anything for step 2.
+    // However long we wait, that must not get auto-graded.
+    act(() => vi.advanceTimersByTime(SETTLE_MS * 5))
+    expect(result.current.status).toBe('listening')
+    expect(result.current.lastEvaluation).toBeNull()
+  })
+
+  it('grades the new step once the held notes actually change, even by one note', () => {
+    const { result } = renderHook(() => useTrainingTask(TASK, KEY))
+
+    act(() => playCMajor())
+    act(() => vi.advanceTimersByTime(SETTLE_MS + FEEDBACK_MS))
+    expect(result.current.stepIndex).toBe(1)
+
+    // Move C -> F (common tones E, G held over), a genuine change.
+    act(() => {
+      heldNotesStore.noteOff(midiNote(60), SOURCE)
+      heldNotesStore.noteOn(midiNote(65), SOURCE)
+    })
     act(() => vi.advanceTimersByTime(SETTLE_MS))
     expect(result.current.status).toBe('graded')
-    expect(result.current.lastEvaluation?.result).toBe('incorrect') // F A C expected, C E G held
+    expect(result.current.lastEvaluation?.result).toBe('incorrect') // F E G held, F A C expected
   })
 
   it('skip/abandon/reset drive the underlying machine', () => {

@@ -51,12 +51,18 @@ export function useTrainingTask(
   const stepResults = useSelector(actorRef, (snapshot) => snapshot.context.stepResults)
 
   useEffect(() => {
+    // Deliberately keyed on heldNotes only, not stepIndex. An earlier
+    // version also re-sent on every step transition so a step starting on a
+    // held-over common tone couldn't stall forever — but that meant resting
+    // motionless on the previous (already-graded) chord shape for long
+    // enough would silently grade the *new* step against stale input the
+    // user never actually played for it, contradicting "no time pressure."
+    // Requiring a genuine change is also strictly correct for real
+    // common-tone carryover: moving from one chord to the next always
+    // changes at least one note, which is itself a real heldNotes event —
+    // so voice-leading exercises still work with zero special-casing here.
     actorRef.send({ type: 'NOTES_CHANGED', heldNotes })
-    // Also re-seeds on stepIndex change (not just heldNotes change): a step
-    // that starts with a held-over common tone and no further physical key
-    // change would otherwise never get a NOTES_CHANGED event to arm its
-    // debounce at all.
-  }, [actorRef, heldNotes, stepIndex])
+  }, [actorRef, heldNotes])
 
   const currentStep = resolvedSteps[stepIndex]
 
